@@ -1,6 +1,9 @@
+#include <cstdint>
 #include <string>
 #include <vector>
 #include <iostream>
+#include <map>
+#include <variant>
 
 #include "airplay_device.hpp"
 #include "airplay_browser.hpp"
@@ -14,6 +17,8 @@ __attribute__((weak)) int main() {
     for (auto device : devices) {
         std::cout << "     > " << device.first << std::endl;
         std::cout << "     > " << device.second.get_printable_address() << std::endl;
+        auto requires_pairing = std::get<uint32_t>(device.second.get_txt()["flags"]) & 0x200;
+        std::cout << "     > " << (requires_pairing ? "requires pairing" : "open") << std::endl;
     }
 
     std::cout << "[+] Connecting to device:" << std::endl;

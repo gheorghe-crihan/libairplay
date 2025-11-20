@@ -1,5 +1,7 @@
 #include <iostream>
 #include <exception>
+#include <map>
+#include <variant>
 #include <netdb.h>
 #include <dns_sd.h>
 #include <arpa/inet.h>
@@ -13,6 +15,9 @@
 #endif
 
 const std::string airplay_browser::AIRPLAY_REGTYPE = "_airplay._tcp";
+
+std::map<std::string, std::variant<uint32_t, std::string>>
+process_txt_record(const unsigned char *txt_rec, unsigned short txt_rec_len);
 
 airplay_browser::airplay_browser() {
     CHECK_AND_THROW(kDNSServiceErr_NoError == DNSServiceBrowse(&_dns_browse_ref,
@@ -103,17 +108,18 @@ void airplay_browser::resolve_callback(DNSServiceRef sdRef,
                                        const char *fullname,
                                        const char *hosttarget,
                                        uint16_t port,
-                                       uint16_t,
-                                       const unsigned char*,
+                                       uint16_t txtLen,
+                                       const unsigned char* txtRecord,
                                        airplay_browser *context){
     CHECK_AND_THROW(kDNSServiceErr_NoError == errorCode, "resolve_callback failed");
 
     const struct hostent* host = gethostbyname(hosttarget);
     const auto addr_list = reinterpret_cast<struct in_addr**>(host->h_addr_list);
 
+    auto txtMap = process_txt_record(txtRecord, txtLen);
     const std::pair<std::string, address> device_info(context->_current_resolved_service_name,
                                                       address(ntohl(static_cast<uint32_t>((addr_list[0])->s_addr)),
-                                                              ntohs(port)));
+                                                              ntohs(port), txtMap));
     context->_devices.insert(device_info);
 
     context->_current_resolved_service_name = "";

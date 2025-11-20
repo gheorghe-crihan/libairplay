@@ -20,3 +20,11 @@ make -f Makefile.osx
 # Needs Avahi/mDNS compatibility libraries installed. Use GNU make:
 $ make -f Makefile.linux
 ```
+
+# Tested
+Under RPI Zero W Debian Bullseye.
+
+# Status
+This is Work-In-Progress.
+Next step involves implementing the Fruit pairing protocol, similar to
+https://github.com/mikebrady/shairport-sync/blob/3c8ceb7c97c8782903ec48e280023436711e0913/pair_ap/pair_fruit.c .

@@ -21,6 +21,11 @@ uint16_t address::get_port() const {
     return _port;
 }
 
+std::map<std::string, std::variant<uint32_t, std::string>>
+address::get_txt() const {
+    return _txt;
+}
+
 std::string address::get_printable_address() const {
     in_addr addr;
     addr.s_addr = ntohl(_address);
